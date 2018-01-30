@@ -1,0 +1,239 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf820
+{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red255\green0\blue0;\red128\green0\blue128;\red0\green0\blue0;
+}
+{\*\expandedcolortbl;;\csgenericrgb\c100000\c0\c0;\csgenericrgb\c50000\c0\c50000;\csgenericrgb\c0\c0\c0;
+}
+\margl1440\margr1440\vieww12560\viewh14600\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 /* \'97\'97\'97\'97> ASSIGNMENT 3 <\'97\'97\'97 */\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+\cb2 //STILL NEEDS TESTING!!\
+\cb1 // \'97> PT. 1\
+// \'97> PT. 2\
+\
+// PART 1:\
+\
+/* Question 1 */ \
+\
+SELECT MIN(Sales) AS \'93Min. Sales\'94, MAX(Sales) AS \'93Max. Sales\'94\
+FROM Offices;\
+\
+/* Question 2 */\
+\
+SELECT COUNT(*) AS \'931989 Orders\'94\
+FROM Orders\
+WHERE Order_Date >= \'9201-JAN-89\'92 AND Order_Date <= \'9231-DEC-89\'92;\
+	//\cf3 Q: Is there a better way to do this? Where you could ignore day and month?\cf0 \
+\
+\cf4 /* Question 3 */ \cf0 \
+\
+SELECT Title AS \'93Different Titles\'94, COUNT(Title) AS \'93No. of Positions\'94\
+FROM Salesreps\
+GROUP BY Title;\
+\
+\cf4 /* Question 4 */ \
+\cf0 \
+SELECT AVG(Quota) AS \'93Avg. Quota\'94\
+FROM Salesreps\
+WHERE Rep_Office = 21;\
+\
+/* Question 5 */\
+\
+SELECT Rep_Office AS \'93Rep. Office\'94, AVG(Sales) AS \'93Avg. Sales\'94\
+FROM Salesreps\
+GROUP BY Rep_Office;\
+\
+/* Question 6 */\
+\
+SELECT Rep AS "Rep. No.",\
+	MIN(Amount) AS "Min. Order Amt.",\
+     MAX(Amount) AS "Max. Order Amt.",\
+     AVG(Amount) AS "Avg. Order Amt."\
+FROM Orders\
+WHERE 1 <       (SELECT COUNT(*)\
+                FROM Orders\
+                WHERE Order_Date >= '01-JAN-90' AND Order_Date <= '31-DEC-99')\
+GROUP BY Rep\
+ORDER BY Rep;\
+\
+/* Question 7 */\
+\
+SELECT Cust_Num AS \'93Customer No.\'94, Company AS \'93Name\'94, \
+	Credit_Limit AS \'93Credit Limit\'94\
+FROM Customers\
+WHERE Credit_Limit <	(SELECT SUM(Amount)\
+					FROM Orders\
+					WHERE Cust = Cust_Num);\
+\
+/* Question 8 */\
+\
+SELECT Cust_Num AS \'93Cust. No.\'94, Cust_Rep AS \'93Rep. ID\'94, Credit_Limit AS \'93Credit Limit\'94\
+FROM Customers\
+WHERE Credit_Limit > ALL (SELECT Credit_Limit\
+					FROM Customers\
+					WHERE Cust_Rep = 109);\
+\
+/* Question 9 */\
+\
+SELECT Cust_Num AS "Cust. No.\'94, Cust_Rep AS \'93Rep. ID\'94, \
+	Credit_Limit AS \'93Credit Limit\'94\
+FROM Customers\
+WHERE Credit_Limit >	(SELECT MAX(Credit_Limit)\
+					FROM Customers\
+					WHERE Cust_Rep = 109);\
+\
+/* Question 10 */ \
+\
+SELECT DISTINCT Rep AS "Rep. ID"\
+FROM ORDERS\
+WHERE Cust IN   (SELECT Cust_Num\
+                FROM Customers\
+                WHERE Company IN('Zetacorp', 'JCP Inc.\'92));\
+\
+/* Question 11 */ \
+\
+SELECT Empl_Num AS \'93Rep. ID\'94, Name AS \'93Name\'94\
+FROM Salesreps\
+WHERE Empl_Num IN	(SELECT DISTINCT Cust_Rep\
+				FROM Customers\
+				WHERE Credit_Limit > 5000);\
+\
+/* Question 12 */ \
+\
+SELECT Empl_Num AS \'93Rep. ID\'94, Name AS \'93Name\'94\
+FROM Salesreps\
+WHERE EXISTS 	(SELECT *\
+			FROM Orders\
+			WHERE Order_Date = Hire_Date \
+				AND Empl_Num = Rep); \
+\
+\cf4 /* Question 13 */ \'97> Is this right? I feel like the WHERE NOT makes no sense.\
+\cf0 \
+SELECT Mfr_ID AS "Mfr. ID", Product_ID AS "Prod."\
+FROM Products\
+WHERE NOT EXISTS        (SELECT *\
+                        FROM Orders\
+                        WHERE Product = Product_ID);\
+\
+\
+// PART 2:\
+\
+/* Question 14 */\
+\
+INSERT INTO Offices(Office, City, Region, Mgr, Target, Sales)\
+	VALUES (39, \'93Miami, \'93Southern\'94, 106, 1000000, 0);\
+\
+/* Question 15 */\
+\
+INSERT INTO Salesreps\
+	VALUES(772, \'91Malialosa Taupule\'92, NULL, NULL, NULL, SYSDATE, NULL, NULL, 0);\
+\
+/* Question 16 */\
+\
+INSERT INTO Salesreps(Empl_Num, Name, Hire_Date, Sales)	\
+	VALUES(814, \'91Tom Sawyer\'92, SYSDATE, 0);\
+\
+/* Question 17 */\
+\
+DELETE FROM Orders\
+WHERE Rep IN(108, 101, 102);	\
+\
+/* Question 18 */ \
+\
+DELETE FROM Salesreps\
+WHERE (Hire_Date < '01-JAN-1987')\
+        AND NOT EXISTS (SELECT *\
+                        FROM Orders\
+                        WHERE Rep = Empl_Num);\
+\
+/* Question 19 */ \
+\
+UPDATE Salesreps\
+SET Age = 37, Rep_Office = 39, Title = \'91Senior VP\'92, Manager = NULL, Quota = 100000\
+WHERE Empl_Num = 772;  	\
+\
+/* Question 20 */ \
+\
+UPDATE Customers\
+SET Credit_Limit = (1.2 * Credit_Limit)\
+WHERE 2 <=	(SELECT COUNT(*)\
+			FROM Orders\
+			WHERE Cust = Cust_Num AND Amount > 25000);\
+\
+/* Question 21 */ \'97> ??\
+\
+UPDATE Customers\
+SET Credit_Limit = 1000 +       (SELECT MAX(Amount)\
+                                FROM Orders\
+                                WHERE Cust = Cust_Num)\
+WHERE Credit_Limit < ANY        (SELECT Amount\
+                                FROM Orders\
+                                WHERE Cust_Num = Cust)\
+\
+/* Question 22 */\
+\
+CREATE VIEW RepInfoView AS\
+	SELECT Name AS \'93Rep. Name\'94, City AS \'93City\'94\
+	FROM Salesreps, Offices\
+	WHERE Rep_Office = Office;\
+\
+/* Question 23 */\
+\
+GRANT SELECT\
+ON RepInfoView\
+TO ahadaegh;\
+\
+/* Question 24 */\
+\
+CREATE VIEW CustInfoView AS\
+        SELECT Company AS "CustName", Product AS "Prod. ID",\
+                Description AS "Product",\
+                Qty AS "Qty. Ordered", Amount AS "Value"\
+        FROM Customers, Products, Orders\
+        WHERE Product = Product_ID AND Cust = Cust_Num;\
+\
+\
+/* Question 25 */\
+\
+GRANT SELECT\
+ON CustInfoView\
+TO PUBLIC;\
+\
+/* Question 26 */\
+\
+REVOKE SELECT\
+ON CustInfoView\
+FROM PUBLIC;\
+\
+/* Question 27 */\
+\
+SELECT *\
+FROM CustInfoView\
+WHERE 'Product' = 'L14\'92;\
+\
+/* Question 28 */\
+\
+CREATE VIEW TheManagers AS\
+	SELECT Name AS \'93Manager\'94, Office AS \'93Office No.\'94, City AS \'93City\'94\
+	FROM Salesreps, Offices\
+	WHERE Empl_Num = Mgr;\
+\
+/* Question 29 */\
+\
+GRANT ALL PRIVILEGES\
+ON TheManagers\
+TO ahadaegh;\
+\
+/* Question 30 */\
+\
+GRANT SELECT, INSERT, UPDATE\
+ON Offices\
+TO jschmidt, kmart;\
+\
+\
+\
+\
+}
